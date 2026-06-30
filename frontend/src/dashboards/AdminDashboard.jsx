@@ -492,13 +492,15 @@ export default function AdminDashboard() {
           + Add Task
         </button>
         
-        <button
-          className="add-task-btn"
-          style={{ marginLeft: "10px" }}
-          onClick={() => setShowRegister(true)}
-        >
-          + Create User
-        </button>
+        {user.role === "manager" && (
+          <button
+            className="add-task-btn"
+            style={{ marginLeft: "10px" }}
+            onClick={() => setShowRegister(true)}
+          >
+            + Create User
+          </button>
+        )}
       </section>
 
       {/* Modal */}
