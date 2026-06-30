@@ -80,7 +80,7 @@ export default function TaskForm({ closeModal }) {
           setForm({ ...form, assignedTo: e.target.value })
         }
       >
-        <option value="">Select user</option>
+        <option value="">Select Employee</option>
 
         {users.length > 0 &&
           users.map((user) => (

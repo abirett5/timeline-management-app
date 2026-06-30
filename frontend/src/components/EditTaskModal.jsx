@@ -1,12 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { createPortal } from "react-dom";
 import { useTasks } from "../context/TaskContext";
 import toast from "react-hot-toast";
-import { useAuth } from "../context/AuthContext";
 
 export default function EditTaskModal({ task, closeModal }) {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await axios.get(
+          "https://timeline-management-app.onrender.com/api/users",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        setUsers(Array.isArray(res.data) ? res.data : []);
+      } catch (error) {
+        console.error("Failed to fetch users", error);
+        setUsers([]);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
   const { updateTask } = useTasks();
-  const { user } = useAuth();
 
   const [form, setForm] = useState({
     _id: task._id,
@@ -58,18 +81,22 @@ export default function EditTaskModal({ task, closeModal }) {
             }
           />
 
-          {user.role !== "employee" && (
-            <>
-                <label>Assigned to</label>
-                <input
-                  value={form.assignedTo}
-                  required
-                  onChange={(e) =>
-                    setForm({ ...form, assignedTo: e.target.value })
-                  }
-                />
-            </>
-          )}
+          <label>Assigned to</label>
+          <select
+            value={form.assignedTo}
+            required
+            onChange={(e) =>
+              setForm({ ...form, assignedTo: e.target.value })
+            }
+          >
+            <option value="">Select Employee</option>
+
+            {users.map((user) => (
+              <option key={user._id} value={user.name}>
+                {user.name} ({user.role})
+              </option>
+            ))}
+          </select>
 
           <label>Priority</label>
           <select
