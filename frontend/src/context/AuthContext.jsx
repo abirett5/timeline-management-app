@@ -21,7 +21,7 @@ export function AuthProvider({ children }) {
   const login = async (name, password) => {
     try {
       const res = await axios.post(
-        "https://task-management-app-v-2.onrender.com/api/auth/login",
+        "https://timeline-management-app.onrender.com/api/auth/login",
         { name, password }
       );
 
