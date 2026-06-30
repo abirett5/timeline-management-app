@@ -3,9 +3,12 @@ import axios from "axios";
 import { createPortal } from "react-dom";
 import { useTasks } from "../context/TaskContext";
 import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
+import "./editTask.css"
 
 export default function EditTaskModal({ task, closeModal }) {
   const [users, setUsers] = useState([]);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -84,19 +87,27 @@ export default function EditTaskModal({ task, closeModal }) {
           <label>Assigned to</label>
           <select
             value={form.assignedTo}
-            required
+            disabled={user.role === "employee"}
             onChange={(e) =>
               setForm({ ...form, assignedTo: e.target.value })
             }
           >
-            <option value="">Select Employee</option>
+            <option value="">Select user</option>
 
-            {users.map((user) => (
-              <option key={user._id} value={user.name}>
-                {user.name} ({user.role})
+            {users.map((u) => (
+              <option key={u._id} value={u.name}>
+                {u.name} ({u.role})
               </option>
             ))}
           </select>
+
+          {user.role === "employee" && (
+            <div style={{ marginBottom: "12px" }}>
+              <small style={{ color: "#888" }}>
+                Only admin or manager can change assignment
+              </small>
+            </div>
+          )}
 
           <label>Priority</label>
           <select

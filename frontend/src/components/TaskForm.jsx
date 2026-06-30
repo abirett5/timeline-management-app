@@ -2,9 +2,12 @@ import { useState, useEffect } from "react";
 import { useTasks } from "../context/TaskContext";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 
 export default function TaskForm({ closeModal }) {
+  const { user } = useAuth();
   const [users, setUsers] = useState([]);
+
     useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -33,7 +36,7 @@ export default function TaskForm({ closeModal }) {
 
   const [form, setForm] = useState({
     title: "",
-    assignedTo: "",
+    assignedTo: user.role === "employee" ? user.name : "",
     status: "todo",
     priority: "medium",
     deadline: "",
@@ -42,17 +45,16 @@ export default function TaskForm({ closeModal }) {
   const submit = async (e) => {
     e.preventDefault();
 
+    const payload = {
+      ...form,
+      assignedTo:
+        user.role === "employee" ? user.name : form.assignedTo,
+    };
+
     try {
-      await addTask(form);
+      await addTask(payload);
 
       toast.success("Task added successfully ✅");
-
-      setForm({
-        title: "",
-        assignedTo: "",
-        status: "todo",
-        priority: "medium",
-      });
 
       closeModal();
     } catch (error) {
@@ -72,23 +74,26 @@ export default function TaskForm({ closeModal }) {
         onChange={(e) => setForm({ ...form, title: e.target.value })}
       />
 
-      <label>Assign to:</label>
-      <select
-        value={form.assignedTo}
-        required
-        onChange={(e) =>
-          setForm({ ...form, assignedTo: e.target.value })
-        }
-      >
-        <option value="">Select Employee</option>
+      {user.role !== "employee" && (
+        <>
+          <label>Assign to:</label>
+          <select
+            value={form.assignedTo}
+            required
+            onChange={(e) =>
+              setForm({ ...form, assignedTo: e.target.value })
+            }
+          >
+            <option value="">Select Employee</option>
 
-        {users.length > 0 &&
-          users.map((user) => (
-            <option key={user._id} value={user.name}>
-              {user.name} ({user.role})
-            </option>
-          ))}
-      </select>
+            {users.map((u) => (
+              <option key={u._id} value={u.name}>
+                {u.name} ({u.role})
+              </option>
+            ))}
+          </select>
+        </>
+      )}
 
       <label>Priority:</label>
       <select
