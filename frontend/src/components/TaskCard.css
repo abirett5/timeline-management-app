@@ -211,6 +211,17 @@ select {
   background: #b91c1c;
 }
 
+.self-assigned-badge {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e40af;
+  background: #e0e7ff;
+  border-radius: 999px;
+}
+
 /* ===============================
    Responsive
 ================================ */

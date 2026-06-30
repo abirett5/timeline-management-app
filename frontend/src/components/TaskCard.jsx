@@ -12,6 +12,9 @@ export default function TaskCard({ task }) {
   const [showEdit, setShowEdit] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  const isSelfAssigned =
+    user.role === "employee" && task.assignedTo === user.name;
+
   const isOverdue =
     task.deadline &&
     new Date(task.deadline) < new Date() &&
@@ -61,6 +64,10 @@ export default function TaskCard({ task }) {
   return (
     <div className={`task-card ${getDeadlineUrgency(task.deadline)}`}>
       <h4>{task.title}</h4>
+
+      {isSelfAssigned && (
+        <span className="self-assigned-badge">👤 Self-Assigned</span>
+      )}
 
       {user.role !== "employee" && (
         <p className="assigned-to">
