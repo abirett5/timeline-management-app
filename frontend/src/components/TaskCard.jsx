@@ -4,13 +4,15 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import EditTaskModal from "./EditTaskModal";
 import ConfirmModal from "./ConfirmModal";
+import TaskDetailsModal from "./TaskDetailsModal";
 import "./TaskCard.css";
 
 export default function TaskCard({ task }) {
-  const { updateTaskStatus, deleteTask } = useTasks();
+  const { deleteTask } = useTasks();
   const { user } = useAuth();
   const [showEdit, setShowEdit] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   const isSelfAssigned =
     user.role === "employee" && task.assignedTo === user.name;
@@ -19,8 +21,6 @@ export default function TaskCard({ task }) {
     task.deadline &&
     new Date(task.deadline) < new Date() &&
     task.status !== "done";
-
-  const canEdit = user.role === "admin" || user.role === "manager";
 
   const getRemainingDays = (deadline) => {
     if (!deadline) return null;
@@ -88,21 +88,6 @@ export default function TaskCard({ task }) {
 
       <p className={`status-${task.status}`} style={{ marginRight: "4px" }}>
         <strong>Status:</strong>{" "}
-        {/* {user.role === "employee" ? (
-          <select
-            value={task.status}
-            onChange={(e) =>
-              updateTaskStatus(task._id, e.target.value)
-            }
-          >
-            <option value="todo">To-Do</option>
-            <option value="in-progress">In Progress</option>
-            <option value="done">Done</option>
-          </select>
-        ) : (
-          task.status
-        )} */}
-
         { task.status }
       </p>
       
@@ -114,22 +99,6 @@ export default function TaskCard({ task }) {
         <span className="overdue-badge" style={{ marginRight: "4px" }}>⚠ Overdue</span>
       )}
 
-      {/* Admin + Manager only */}
-      {/* {canEdit && (
-        <div className="task-actions">
-          <button className="edit-btn" onClick={() => setShowEdit(true)}>
-            Edit
-          </button>
-
-          <button
-            className="logout-btn"
-            onClick={() => setShowDeleteConfirm(true)}
-          >
-            Delete
-          </button>
-        </div>
-      )} */}
-
       <div className="task-actions">
         <button className="edit-btn" onClick={() => setShowEdit(true)}>
           Edit
@@ -140,6 +109,13 @@ export default function TaskCard({ task }) {
           onClick={() => setShowDeleteConfirm(true)}
         >
           Delete
+        </button>
+
+        <button
+          className="view-btn"
+          onClick={() => setShowDetails(true)}
+        >
+          View Details
         </button>
       </div>
 
@@ -167,6 +143,13 @@ export default function TaskCard({ task }) {
               setShowDeleteConfirm(false);
             }
           }}
+        />
+      )}
+
+      {showDetails && (
+        <TaskDetailsModal
+          task={task}
+          closeModal={() => setShowDetails(false)}
         />
       )}
     </div>
